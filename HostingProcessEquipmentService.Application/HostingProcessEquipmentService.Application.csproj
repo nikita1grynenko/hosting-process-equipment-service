@@ -1,0 +1,14 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\HostingProcessEquipmentService.Domain\HostingProcessEquipmentService.Domain.csproj" />
+      <ProjectReference Include="..\HostingProcessEquipmentService.Infrastructure\HostingProcessEquipmentService.Infrastructure.csproj" />
+    </ItemGroup>
+
+</Project>
