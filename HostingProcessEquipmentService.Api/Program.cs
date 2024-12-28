@@ -1,9 +1,12 @@
+using HostingProcessEquipmentService.Api.Configuration;
+using HostingProcessEquipmentService.Api.Middlewares;
 using HostingProcessEquipmentService.Application.Contracts;
 using HostingProcessEquipmentService.Application.Services;
 using HostingProcessEquipmentService.Infrastructure.Context;
 using HostingProcessEquipmentService.Infrastructure.Contracts;
 using HostingProcessEquipmentService.Infrastructure.Repositories;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 
 namespace HostingProcessEquipmentService.Api;
 
@@ -12,28 +15,73 @@ public class Program
     public static void Main(string[] args)
     {
         var builder = WebApplication.CreateBuilder(args);
-        
+
+        // Load user secrets in development environment
+        if (builder.Environment.IsDevelopment())
+        {
+            builder.Configuration.AddUserSecrets<Program>();
+        }
+
+        // Configure DbContext with connection string from user secrets
         builder.Services.AddDbContext<AppDbContext>(options =>
         {
-            options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
+            var connectionString = builder.Configuration.GetConnectionString("AzureSqlConnection");
+            if (string.IsNullOrEmpty(connectionString))
+            {
+                throw new InvalidOperationException("Connection string 'AzureSqlConnection' is not found.");
+            }
+            options.UseSqlServer(connectionString);
         });
+
         // Register repositories
         builder.Services.AddScoped<IContractRepository, ContractRepository>();
 
         // Register services
         builder.Services.AddScoped<IContractService, ContractService>();
-
-        // Add controllers
+        builder.Services.Configure<AzureQueueSettings>(builder.Configuration.GetSection("AzureQueue"));
+        builder.Services.AddSingleton<IQueueService, QueueService>();
+        builder.Services.AddHostedService<AzureQueueBackgroundService>();
         builder.Services.AddControllers();
-        // Add services to the container.
 
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Title = "Your API",
+                Version = "v1",
+                Description = "API with API Key Authentication"
+            });
+
+            // Add API Key security definition
+            c.AddSecurityDefinition("ApiKey", new OpenApiSecurityScheme
+            {
+                Description = "API Key needed to access endpoints. Use the format: X-Api-Key: {your_api_key}",
+                In = ParameterLocation.Header,
+                Name = "X-Api-Key",
+                Type = SecuritySchemeType.ApiKey,
+                Scheme = "ApiKeyScheme"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "ApiKey"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+        });
 
         var app = builder.Build();
 
-        // Configure the HTTP request pipeline.
+        // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())
         {
             app.UseSwagger();
@@ -41,62 +89,14 @@ public class Program
         }
 
         app.UseHttpsRedirection();
-        
-        app.MapControllers();
+
+        // Add API Key Middleware
+        app.UseMiddleware<ApiKeyMiddleware>();
+
         app.UseAuthorization();
+
+        app.MapControllers();
 
         app.Run();
     }
-    
-    /*var builder = WebApplication.CreateBuilder(args);
-
-    // Add services to the container.
-
-    // Configure database connection
-    builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
-
-    // Register repositories
-    builder.Services.AddScoped<IContractRepository, ContractRepository>();
-
-    // Register services
-    builder.Services.AddScoped<IContractService, ContractService>();
-
-    // Add controllers
-    builder.Services.AddControllers();
-
-    // Add Swagger/OpenAPI support
-    builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen(c =>
-    {
-        c.SwaggerDoc("v1", new OpenApiInfo
-        {
-            Title = "Equipment Placement API",
-            Version = "v1",
-            Description = "API for managing equipment placement contracts"
-        });
-    });
-
-// Configure API key authentication middleware (simple example)
-/*builder.Services.AddAuthentication("ApiKey")
-    .AddScheme<ApiKeyAuthenticationOptions, ApiKeyAuthenticationHandler>("ApiKey", options => { });#1#
-
-var app = builder.Build();
-
-// Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI(/*c =>
-    {
-        c.SwaggerEndpoint("/swagger/v1/swagger.json", "Equipment Placement API v1");
-        c.RoutePrefix = string.Empty; // Make Swagger UI accessible at root
-    }#1#);
-}
-
-app.UseHttpsRedirection();
-        
-app.MapControllers();
-
-app.Run();*/
 }
