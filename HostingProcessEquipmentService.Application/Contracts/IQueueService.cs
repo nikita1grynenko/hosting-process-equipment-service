@@ -1,6 +1,7 @@
 ﻿namespace HostingProcessEquipmentService.Application.Contracts;
 
-public class IQueueService
+public interface IQueueService
 {
-    
+    Task EnqueueMessageAsync(string message);
+    Task<string?> DequeueMessageAsync(CancellationToken cancellationToken);
 }
