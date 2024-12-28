@@ -8,10 +8,14 @@ namespace HostingProcessEquipmentService.Application.Services;
 public class ContractService : IContractService
 {
     private readonly IContractRepository _contractRepository;
+    private readonly IQueueService _queueService;
 
-    public ContractService(IContractRepository contractRepository)
+    public ContractService(
+        IContractRepository contractRepository,
+        IQueueService queueService)
     {
         _contractRepository = contractRepository;
+        _queueService = queueService;
     }
 
     public async Task CreateContractAsync(CreateContractDto dto)
@@ -24,13 +28,11 @@ public class ContractService : IContractService
         if (equipment == null)
             throw new InvalidOperationException("Process equipment not found.");
 
-        // Перевірка площі
         var usedArea = await _contractRepository.GetUsedAreaAsync(facility.Id);
         var requiredArea = dto.EquipmentQuantity * equipment.Area;
         if (usedArea + requiredArea > facility.StandardArea)
             throw new InvalidOperationException("Not enough space in the facility.");
 
-        // Створення контракту
         var contract = new EquipmentPlacementContract
         {
             ProductionFacilityId = facility.Id,
@@ -39,6 +41,10 @@ public class ContractService : IContractService
         };
 
         await _contractRepository.AddContractAsync(contract);
+
+        // Додаємо контракт у чергу
+        var message = $"Contract {contract.Id} created for facility {facility.Name} with equipment {equipment.Name}.";
+        await _queueService.EnqueueMessageAsync(message);
     }
 
     public async Task<IEnumerable<ContractDto>> GetContractsAsync()
