@@ -8,6 +8,12 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostingProcessEquipmentServ
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostingProcessEquipmentService.Api", "HostingProcessEquipmentService.Api\HostingProcessEquipmentService.Api.csproj", "{D5C7FACB-B329-4AAB-8274-29CC0763292F}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{5479430C-DC8F-4477-9C7C-F3635C9C0FAC}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "test", "test", "{F36AD588-1161-411B-848C-9E7447D95BEA}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HostingProcessEquipmentService.Api.Tests", "HostingProcessEquipmentService.Api.Tests\HostingProcessEquipmentService.Api.Tests.csproj", "{00228A79-7D29-43E1-B4BA-E8127EE55B82}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -30,5 +36,16 @@ Global
 		{D5C7FACB-B329-4AAB-8274-29CC0763292F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D5C7FACB-B329-4AAB-8274-29CC0763292F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D5C7FACB-B329-4AAB-8274-29CC0763292F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{00228A79-7D29-43E1-B4BA-E8127EE55B82}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{00228A79-7D29-43E1-B4BA-E8127EE55B82}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{00228A79-7D29-43E1-B4BA-E8127EE55B82}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{00228A79-7D29-43E1-B4BA-E8127EE55B82}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{D5C7FACB-B329-4AAB-8274-29CC0763292F} = {5479430C-DC8F-4477-9C7C-F3635C9C0FAC}
+		{1A7F9544-64CD-46C6-9904-1A1F874E8097} = {5479430C-DC8F-4477-9C7C-F3635C9C0FAC}
+		{AF4E8E31-95DB-4BBC-BD9C-9666A3C28EC4} = {5479430C-DC8F-4477-9C7C-F3635C9C0FAC}
+		{B207EFE3-178F-417B-A475-E5DF56FFC32F} = {5479430C-DC8F-4477-9C7C-F3635C9C0FAC}
+		{00228A79-7D29-43E1-B4BA-E8127EE55B82} = {F36AD588-1161-411B-848C-9E7447D95BEA}
 	EndGlobalSection
 EndGlobal
