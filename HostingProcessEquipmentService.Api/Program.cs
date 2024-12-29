@@ -1,5 +1,5 @@
-using HostingProcessEquipmentService.Api.Configuration;
 using HostingProcessEquipmentService.Api.Middlewares;
+using HostingProcessEquipmentService.Application.Configuration;
 using HostingProcessEquipmentService.Application.Contracts;
 using HostingProcessEquipmentService.Application.Services;
 using HostingProcessEquipmentService.Infrastructure.Context;
@@ -21,6 +21,16 @@ public class Program
         {
             builder.Configuration.AddUserSecrets<Program>();
         }
+        
+        builder.Services.AddCors(options =>
+        {
+            options.AddPolicy("AllowAll", policy =>
+            {
+                policy.AllowAnyOrigin() 
+                    .AllowAnyHeader() 
+                    .AllowAnyMethod(); 
+            });
+        });
 
         // Configure DbContext with connection string from user secrets
         builder.Services.AddDbContext<AppDbContext>(options =>
@@ -48,7 +58,7 @@ public class Program
         {
             c.SwaggerDoc("v1", new OpenApiInfo
             {
-                Title = "Your API",
+                Title = "Hosting process equipment for production facilities API.",
                 Version = "v1",
                 Description = "API with API Key Authentication"
             });
@@ -77,9 +87,17 @@ public class Program
                     Array.Empty<string>()
                 }
             });
+            
+            c.AddServer(new OpenApiServer
+            {
+                Url = "https://hostingprocessequipmentapi-a7ashuhxfqfvche0.polandcentral-01.azurewebsites.net",
+                Description = "Production API"
+            });
         });
 
         var app = builder.Build();
+        
+        app.UseCors("AllowAll");
 
         // Configure the HTTP request pipeline
         if (app.Environment.IsDevelopment())

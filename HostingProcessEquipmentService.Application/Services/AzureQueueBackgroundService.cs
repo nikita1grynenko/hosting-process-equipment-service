@@ -27,12 +27,11 @@ public class AzureQueueBackgroundService : BackgroundService
                 if (message != null)
                 {
                     _logger.LogInformation($"Processing message: {message}");
-                    // Імітація обробки
                     await Task.Delay(1000, stoppingToken);
                 }
                 else
                 {
-                    await Task.Delay(5000, stoppingToken); // Очікуємо нові повідомлення
+                    await Task.Delay(5000, stoppingToken); 
                 }
             }
             catch (Exception ex)

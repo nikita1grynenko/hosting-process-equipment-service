@@ -1,4 +1,4 @@
-﻿namespace HostingProcessEquipmentService.Api.Configuration;
+﻿namespace HostingProcessEquipmentService.Application.Configuration;
 
 public class AzureQueueSettings
 {

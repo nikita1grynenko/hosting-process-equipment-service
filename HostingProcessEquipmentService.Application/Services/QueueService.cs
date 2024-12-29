@@ -1,6 +1,6 @@
 ﻿using Azure.Storage.Queues;
 using Azure.Storage.Queues.Models;
-using HostingProcessEquipmentService.Api.Configuration;
+using HostingProcessEquipmentService.Application.Configuration;
 using HostingProcessEquipmentService.Application.Contracts;
 using Microsoft.Extensions.Options;
 
