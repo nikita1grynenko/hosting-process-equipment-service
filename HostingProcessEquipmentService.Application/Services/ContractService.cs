@@ -42,7 +42,6 @@ public class ContractService : IContractService
 
         await _contractRepository.AddContractAsync(contract);
 
-        // Додаємо контракт у чергу
         var message = $"Contract {contract.Id} created for facility {facility.Name} with equipment {equipment.Name}.";
         await _queueService.EnqueueMessageAsync(message);
     }
